@@ -1,0 +1,39 @@
+name: CarDash
+options:
+  bundleIdPrefix: com.cardash
+  deploymentTarget:
+    iOS: "16.0"
+targets:
+  CarDash:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+    entitlements:
+      path: CarDash.entitlements
+      properties:
+        com.apple.developer.carplay-instruments: true
+        com.apple.developer.carplay-audio: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cardash.dashboard
+        PRODUCT_NAME: CarDash
+        SWIFT_VERSION: "5.9"
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGN_IDENTITY: ""
+        CODE_SIGNING_REQUIRED: "NO"
+        GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_CFBundleDisplayName: 车机仪表
+        INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: 需要连接远驱控制器与蚂蚁保护板读取数据
+        INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription: 需要连接远驱控制器与蚂蚁保护板读取数据
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        TARGETED_DEVICE_FAMILY: "1"
+schemes:
+  CarDash:
+    build:
+      targets:
+        CarDash: all
+    run:
+      config: Release
+    archive:
+      config: Release
