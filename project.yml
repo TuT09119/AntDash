@@ -1,0 +1,35 @@
+name: AntDash
+options:
+  bundleIdPrefix: com.antdash
+  deploymentTarget:
+    iOS: "15.0"
+targets:
+  AntDash:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.antdash.app
+        PRODUCT_NAME: 蚂蚁仪表
+        SWIFT_VERSION: "5.9"
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGN_IDENTITY: ""
+        CODE_SIGNING_REQUIRED: "NO"
+        GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_CFBundleDisplayName: 蚂蚁仪表
+        INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: 需要连接蚂蚁保护板读取电池数据
+        INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription: 需要连接蚂蚁保护板读取电池数据
+        INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: 使用 GPS 显示骑行速度
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        TARGETED_DEVICE_FAMILY: "1"
+schemes:
+  AntDash:
+    build:
+      targets:
+        AntDash: all
+    run:
+      config: Release
+    archive:
+      config: Release
