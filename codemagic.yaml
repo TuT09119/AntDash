@@ -5,13 +5,9 @@ workflows:
     scripts:
       - name: Install tools
         script: |
+          export PATH="/opt/homebrew/bin:$PATH"
           brew install xcodegen
-          if ! command -v ldid >/dev/null 2>&1; then
-            brew install ldid || \
-            curl -L -o /usr/local/bin/ldid https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_arm64 || \
-            curl -L -o /usr/local/bin/ldid https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_x86_64
-            chmod +x /usr/local/bin/ldid
-          fi
+          brew install ldid
       - name: Build unsigned + fakesign
         script: |
           cd CarDash
