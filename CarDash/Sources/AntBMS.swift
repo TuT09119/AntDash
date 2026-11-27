@@ -4,7 +4,7 @@ import CoreBluetooth
 // 蚂蚁保护板 (ANT BMS) BLE 管理器 —— 纯读取
 // 协议来源: https://github.com/yosle/ant-bms-ble (MIT)
 // 服务 FFE0 / 特征 FFE1，写 0x01 请求帧，收 0x11 实时帧
-final class AntBMSManager: NSObject, ObservableObject {
+final class AntBMSManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     @Published var status: String = "未连接"
     @Published var packVoltage: Double = 0    // V
     @Published var current: Double = 0        // A（负=充电）
