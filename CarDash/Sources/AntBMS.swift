@@ -105,11 +105,11 @@ final class AntBMSManager: NSObject, ObservableObject, CBCentralManagerDelegate,
     }
 
     private func rejectCurrent() {
-        if let p = peripheral {
+        if let p = self.peripheral {
             rejected.insert(p.identifier)
             central?.cancelPeripheralConnection(p)
         }
-        peripheral = nil
+        self.peripheral = nil
         status = "非蚂蚁设备，继续搜索…"
         central?.scanForPeripherals(withServices: [Self.svcUUID], options: nil)
     }
