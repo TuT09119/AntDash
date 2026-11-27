@@ -1,0 +1,14 @@
+task:
+  name: Build IPA (macOS)
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-sonoma-xcode:latest
+  build_script:
+    - brew install xcodegen
+    - xcodegen generate
+    - xcodebuild -project AntDash.xcodeproj -scheme AntDash -sdk iphoneos -configuration Release -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+    - mkdir Payload
+    - cp -R build/Build/Products/Release-iphoneos/AntDash.app Payload/
+    - zip -qr AntDash.ipa Payload
+    - ls -lh AntDash.ipa
+  artifacts:
+    path: AntDash.ipa
