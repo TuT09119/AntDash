@@ -14,13 +14,9 @@ jobs:
 
       - name: 安装工具
         run: |
+          export PATH="/opt/homebrew/bin:$PATH"
           brew install xcodegen
-          if ! command -v ldid >/dev/null 2>&1; then
-            brew install ldid || \
-            curl -L -o /usr/local/bin/ldid https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_arm64 || \
-            curl -L -o /usr/local/bin/ldid https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_x86_64
-            chmod +x /usr/local/bin/ldid
-          fi
+          brew install ldid
 
       - name: 生成工程并编译
         working-directory: CarDash
