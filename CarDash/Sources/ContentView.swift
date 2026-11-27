@@ -86,13 +86,12 @@ struct ContentView: View {
     func startSync() {
         sync = far.objectWillChange
             .merge(with: ant.objectWillChange)
-            .sink { [weak self] in
-                guard let self = self else { return }
-                CarPlaySceneDelegate.speedText = String(format: "%.0f", self.far.speedKmh)
-                CarPlaySceneDelegate.currentText = String(format: "%.1fA", self.far.lineCurrent)
-                CarPlaySceneDelegate.ctrlTempText = "\(self.far.controllerTemp)℃"
-                CarPlaySceneDelegate.socText = self.ant.soc > 0 ? "\(self.ant.soc)%" : "\(self.far.soc)%"
-                CarPlaySceneDelegate.voltText = String(format: "%.0fV", self.far.voltage > 0 ? self.far.voltage : self.ant.packVoltage)
+            .sink { [self] in
+                CarPlaySceneDelegate.speedText = String(format: "%.0f km/h", self.far.speedKmh)
+                CarPlaySceneDelegate.currentText = String(format: "%.1f A", self.far.lineCurrent)
+                CarPlaySceneDelegate.ctrlTempText = "\(self.far.controllerTemp) ℃"
+                CarPlaySceneDelegate.socText = self.ant.soc > 0 ? "\(self.ant.soc) %" : "\(self.far.soc) %"
+                CarPlaySceneDelegate.voltText = String(format: "%.0f V", self.far.voltage > 0 ? self.far.voltage : self.ant.packVoltage)
             }
     }
 }
