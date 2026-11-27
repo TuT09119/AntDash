@@ -75,7 +75,7 @@ final class AntBMSManager: NSObject, ObservableObject, CBCentralManagerDelegate,
         if !rejected.contains(peripheral.identifier) {
             rejected.insert(peripheral.identifier) // 防止在同一设备上反复失败
         }
-        peripheral = nil
+        self.peripheral = nil
         central.scanForPeripherals(withServices: [Self.svcUUID], options: nil)
     }
 
