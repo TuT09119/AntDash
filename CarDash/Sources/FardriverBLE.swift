@@ -22,6 +22,7 @@ final class FardriverManager: NSObject, ObservableObject, CBCentralManagerDelega
     private var central: CBCentralManager!
     private var peripheral: CBPeripheral?
     private var notifyChar: CBCharacteristic?
+    private var rejected: Set<UUID> = []
 
     static let svcUUID = CBUUID(string: "FFE0")
     static let chrUUID = CBUUID(string: "FFEC")
@@ -60,21 +61,21 @@ final class FardriverManager: NSObject, ObservableObject, CBCentralManagerDelega
                         didDiscover peripheral: CBPeripheral,
                         advertisementData: [String: Any],
                         rssi RSSI: NSNumber) {
-        if self.peripheral == nil {
-            central.stopScan()
-            self.peripheral = peripheral
-            status = "发现控制器，连接中…"
-            central.connect(peripheral, options: nil)
-        }
+        guard self.peripheral == nil, !rejected.contains(peripheral.identifier) else { return }
+        central.stopScan()
+        self.peripheral = peripheral
+        status = "发现控制器，连接中…"
+        central.connect(peripheral, options: nil)
     }
 
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        status = "已连接，读取服务…"
+        status = "已连接，识别设备类型…"
         peripheral.delegate = self
         peripheral.discoverServices([Self.svcUUID])
     }
 
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        self.peripheral = nil
         status = "连接断开，重连中…"
         central.scanForPeripherals(withServices: [Self.svcUUID], options: nil)
     }
@@ -82,7 +83,7 @@ final class FardriverManager: NSObject, ObservableObject, CBCentralManagerDelega
     // MARK: 外设代理
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         guard let svc = peripheral.services?.first(where: { $0.uuid == Self.svcUUID }) else {
-            status = "未找到 FFE0 服务"
+            rejectCurrent()
             return
         }
         peripheral.discoverCharacteristics([Self.chrUUID], for: svc)
@@ -90,12 +91,23 @@ final class FardriverManager: NSObject, ObservableObject, CBCentralManagerDelega
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         guard let chr = service.characteristics?.first(where: { $0.uuid == Self.chrUUID }) else {
-            status = "未找到 FFEC 特征（不是远驱？）"
+            // 没有 FFEC → 不是远驱（可能是蚂蚁保护板），拉黑并换下一个设备
+            rejectCurrent()
             return
         }
         notifyChar = chr
         peripheral.setNotifyValue(true, for: chr)
         status = "已连接远驱，等待数据…"
+    }
+
+    private func rejectCurrent() {
+        if let p = self.peripheral {
+            rejected.insert(p.identifier)
+            central?.cancelPeripheralConnection(p)
+        }
+        self.peripheral = nil
+        status = "非远驱设备，继续搜索…"
+        central?.scanForPeripherals(withServices: [Self.svcUUID], options: nil)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
