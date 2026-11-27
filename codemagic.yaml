@@ -1,0 +1,20 @@
+workflows:
+  build-ipa:
+    name: Build IPA
+    max_build_duration: 60
+    environment:
+      vars:
+        CODE_SIGNING_ALLOWED: "NO"
+    scripts:
+      - name: Install XcodeGen
+        script: brew install xcodegen
+      - name: Build unsigned IPA
+        script: |
+          xcodegen generate
+          xcodebuild -project AntDash.xcodeproj -scheme AntDash -sdk iphoneos -configuration Release -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/AntDash.app Payload/
+          zip -qr AntDash.ipa Payload
+          ls -lh AntDash.ipa
+    artifacts:
+      - AntDash.ipa
