@@ -4,7 +4,7 @@ import CoreBluetooth
 // 远驱(Fardriver)控制器 BLE 管理器
 // 协议来源: ESP32-Fardriver-BLE-Reader (开源, 已验证)
 // 服务 FFE0 / 特征 FFEC，订阅通知即可收到 16 字节状态包（无需写命令）
-final class FardriverManager: NSObject, ObservableObject {
+final class FardriverManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     @Published var status: String = "未连接"
     @Published var voltage: Double = 0        // V
     @Published var lineCurrent: Double = 0    // A（负=能量回收）
