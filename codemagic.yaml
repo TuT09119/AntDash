@@ -1,20 +1,27 @@
 workflows:
   build-ipa:
-    name: Build IPA
+    name: Build CarDash IPA
     max_build_duration: 60
-    environment:
-      vars:
-        CODE_SIGNING_ALLOWED: "NO"
     scripts:
-      - name: Install XcodeGen
-        script: brew install xcodegen
-      - name: Build unsigned IPA
+      - name: Install tools
         script: |
+          brew install xcodegen
+          if ! command -v ldid >/dev/null 2>&1; then
+            brew install ldid || \
+            curl -L -o /usr/local/bin/ldid https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_arm64 || \
+            curl -L -o /usr/local/bin/ldid https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_x86_64
+            chmod +x /usr/local/bin/ldid
+          fi
+      - name: Build unsigned + fakesign
+        script: |
+          cd CarDash
           xcodegen generate
-          xcodebuild -project AntDash.xcodeproj -scheme AntDash -sdk iphoneos -configuration Release -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+          xcodebuild -project CarDash.xcodeproj -scheme CarDash -sdk iphoneos -configuration Release -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+          APP=build/Build/Products/Release-iphoneos/CarDash.app
+          ldid -SCarDash.entitlements "$APP/CarDash"
           mkdir Payload
-          cp -R build/Build/Products/Release-iphoneos/AntDash.app Payload/
-          zip -qr AntDash.ipa Payload
-          ls -lh AntDash.ipa
+          cp -R "$APP" Payload/
+          zip -qr CarDash.ipa Payload
+          ls -lh CarDash.ipa
     artifacts:
-      - AntDash.ipa
+      - CarDash/CarDash.ipa
